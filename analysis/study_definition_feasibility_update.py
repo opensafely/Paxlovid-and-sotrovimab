@@ -207,7 +207,7 @@ study = StudyDefinition(
 
   # TREATMENT - NEUTRALISING MONOCLONAL ANTIBODIES OR ANTIVIRALS ----
   ## hospital-onset COVID
-  covid_therapeutics = patients.with_covid_therapeutics(  ###commented qw-2024_01-16
+  covid_therapeutics = patients.with_covid_therapeutics(  
     #with_these_statuses = ["Approved", "Treatment Complete"],
     with_these_indications = "hospital_onset",
     on_or_after = "index_date",
