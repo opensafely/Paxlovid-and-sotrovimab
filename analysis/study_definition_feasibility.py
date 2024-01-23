@@ -32,7 +32,7 @@ study = StudyDefinition(
   # POPULATION ----
   population = patients.satisfying(
     """
-    date_treated_GP OR date_treated OR date_treated_hosp OR date_treated_out OR covid_test_positive_date OR all_hosp_admission OR death_date
+    date_treated_GP OR date_treated OR date_treated_hosp OR date_treated_out OR covid_test_positive_date OR all_hosp_admission
     """,
   ),
   #require covid_test_positive_date<=date_treated (sensitivity analysis)
