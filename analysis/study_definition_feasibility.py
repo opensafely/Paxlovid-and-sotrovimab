@@ -183,22 +183,8 @@ study = StudyDefinition(
     find_first_match_in_period = True,
     date_format = "YYYY-MM-DD",
   ),
-  paxlovid_GP2 = patients.with_these_medications(
-    codelist = paxlovid_GP_codes2,
-    returning = "date",
-    on_or_after = "index_date",
-    find_first_match_in_period = True,
-    date_format = "YYYY-MM-DD",
-  ),
   molnupiravir_GP = patients.with_these_medications(
     codelist = molnupiravir_GP_codes,
-    returning = "date",
-    on_or_after = "index_date",
-    find_first_match_in_period = True,
-    date_format = "YYYY-MM-DD",
-  ),  
-  molnupiravir_GP2 = patients.with_these_medications(
-    codelist = molnupiravir_GP_codes2,
     returning = "date",
     on_or_after = "index_date",
     find_first_match_in_period = True,
