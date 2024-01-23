@@ -28,51 +28,6 @@ clear
 * import dataset
 import delimited ./output/input_feasibility.csv, delimiter(comma) varnames(1) case(preserve) 
 *describe
-keep if covid_test_positive_date!=""
-*  Convert strings to dates  *
-foreach var of varlist  sotrovimab_covid_therapeutics molnupiravir_covid_therapeutics paxlovid_covid_therapeutics remdesivir_covid_therapeutics	 date_treated  ///
-        covid_test_positive_date covid_test_positive_date2 {
-  capture confirm string variable `var'
-  if _rc==0 {
-  rename `var' a
-  gen `var' = date(a, "YMD")
-  drop a
-  format %td `var'
-  sum `var',f
-  }
-}
-gen infect_month=month(covid_test_positive_date)
-tab infect_month
-gen infect_month2=month(covid_test_positive_date2)
-tab infect_month2
-tab region_nhs,m
-tab region_nhs infect_month, row
-tab region_nhs infect_month2, row
-tab stp,m
-tab stp infect_month
-tab stp infect_month2
-
-gen sotro_month=month(sotrovimab_covid_therapeutics)
-gen pax_month=month(paxlovid_covid_therapeutics)
-gen mol_month=month(molnupiravir_covid_therapeutics)
-gen rem_month=month(remdesivir_covid_therapeutics)
-gen treated_month=month(date_treated)
-tab sotro_month
-tab pax_month
-tab mol_month
-tab rem_month
-tab treated_month
-tab region_nhs sotro_month, row
-tab region_nhs pax_month, row
-tab region_nhs mol_month, row
-tab region_nhs rem_month, row
-tab region_nhs treated_month, row
-tab stp treated_month 
-
-
-log close
-exit, clear
-
 *codebook
 keep if date_treated!=""|date_treated_hosp!=""|all_hosp_admission!=""
 
