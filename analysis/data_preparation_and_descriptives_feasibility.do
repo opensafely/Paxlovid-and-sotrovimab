@@ -457,10 +457,10 @@ tab death_month
 tab region_nhs death_month,row
 tab stp death_month,row
 
-gen treated_month_onset=month(date_treated)
-tab treated_month_onset
-tab region_nhs treated_month_onset, row
-tab stp treated_month_onset,row
+gen treated_month=month(date_treated)
+tab treated_month
+tab region_nhs treated_month, row
+tab stp treated_month,row
 
 gen treated_month_hosp=month(date_treated_hosp)
 tab treated_month_hosp
