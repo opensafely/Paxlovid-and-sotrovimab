@@ -31,7 +31,7 @@ import delimited ./output/input_feasibility.csv, delimiter(comma) varnames(1) ca
 keep if covid_test_positive_date!=""
 *  Convert strings to dates  *
 foreach var of varlist  sotrovimab_covid_therapeutics molnupiravir_covid_therapeutics paxlovid_covid_therapeutics remdesivir_covid_therapeutics	 date_treated  ///
-        covid_test_positive_date covid_test_positive_date2 covid_hosp_not_pri_admission covid_hosp_admission {
+        covid_test_positive_date covid_test_positive_date2 {
   capture confirm string variable `var'
   if _rc==0 {
   rename `var' a
@@ -49,32 +49,26 @@ tab region_nhs,m
 tab region_nhs infect_month, row
 tab region_nhs infect_month2, row
 tab stp,m
-tab stp infect_month, row
+tab stp infect_month
 tab stp infect_month2
 
-*gen sotro_month=month(sotrovimab_covid_therapeutics)
-*gen pax_month=month(paxlovid_covid_therapeutics)
-*gen mol_month=month(molnupiravir_covid_therapeutics)
-*gen rem_month=month(remdesivir_covid_therapeutics)
-*gen treated_month=month(date_treated)
-*tab sotro_month
-*tab pax_month
-*tab mol_month
-*tab rem_month
-*tab treated_month
-*tab region_nhs sotro_month, row
-*tab region_nhs pax_month, row
-*tab region_nhs mol_month, row
-*tab region_nhs rem_month, row
-*tab region_nhs treated_month, row
-*tab stp treated_month 
+gen sotro_month=month(sotrovimab_covid_therapeutics)
+gen pax_month=month(paxlovid_covid_therapeutics)
+gen mol_month=month(molnupiravir_covid_therapeutics)
+gen rem_month=month(remdesivir_covid_therapeutics)
+gen treated_month=month(date_treated)
+tab sotro_month
+tab pax_month
+tab mol_month
+tab rem_month
+tab treated_month
+tab region_nhs sotro_month, row
+tab region_nhs pax_month, row
+tab region_nhs mol_month, row
+tab region_nhs rem_month, row
+tab region_nhs treated_month, row
+tab stp treated_month 
 
-gen covid_hosp_not_pri_month=month(covid_hosp_not_pri_admission)
-tab covid_hosp_not_pri_month
-tab region_nhs covid_hosp_not_pri_month,row
-gen covid_hosp_month=month(covid_hosp_admission)
-tab covid_hosp_month
-tab region_nhs covid_hosp_month,row
 
 log close
 exit, clear
