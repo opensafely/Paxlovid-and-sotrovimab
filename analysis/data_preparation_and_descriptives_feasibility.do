@@ -43,6 +43,8 @@ foreach var of varlist     covid_test_positive_date covid_test_positive_date2 co
   sum `var',f de
   }
 }
+log close
+exit, clear
 
 gen infect_month=month(covid_test_positive_date)
 tab infect_month
@@ -150,7 +152,7 @@ foreach var of varlist      covid_test_positive_date covid_test_positive_date2 	
   gen `var' = date(a, "YMD")
   drop a
   format %td `var'
-  sum `var',f de
+  sum `var',f
   }
 }
 gen infect_month=month(covid_test_positive_date)
@@ -222,35 +224,6 @@ clear
 * import dataset
 import delimited ./output/input_feasibility.csv, delimiter(comma) varnames(1) case(preserve) 
 *describe
-keep if date_treated!="" | date_treated_hosp!=""
-*  Convert strings to dates  *
-foreach var of varlist		date_treated date_treated_hosp {
-  capture confirm string variable `var'
-  if _rc==0 {
-  rename `var' a
-  gen `var' = date(a, "YMD")
-  drop a
-  format %td `var'
-  sum `var',f de
-  }
-}
-
-gen treated_month=month(date_treated)
-tab treated_month
-tab region_nhs treated_month, row
-tab stp treated_month,row
-
-gen treated_month_hosp=month(date_treated_hosp)
-tab treated_month_hosp
-tab region_nhs treated_month_hosp, row
-tab stp treated_month_hosp,row
-
-clear
-
-
-* import dataset
-import delimited ./output/input_feasibility.csv, delimiter(comma) varnames(1) case(preserve) 
-*describe
 keep if all_hosp_admission!=""
 *  Convert strings to dates  *
 foreach var of varlist      covid_test_positive_date covid_test_positive_date2 covid_hosp_not_pri_admission covid_hosp_not_pri_admission2 covid_hosp_admission covid_hosp_admission2 ///
@@ -261,7 +234,7 @@ foreach var of varlist      covid_test_positive_date covid_test_positive_date2 c
   gen `var' = date(a, "YMD")
   drop a
   format %td `var'
-  sum `var',f de
+  sum `var',f
   }
 }
 
@@ -300,7 +273,7 @@ foreach var of varlist  death_with_covid_date death_date  {
   gen `var' = date(a, "YMD")
   drop a
   format %td `var'
-  sum `var',f de
+  sum `var',f
   }
 }
 
@@ -313,159 +286,6 @@ gen death_month=month(death_date)
 tab death_month
 tab region_nhs death_month,row
 tab stp death_month,row
-
-
-
-clear
-
-*high-risk cohort*
-* import dataset
-import delimited ./output/input_feasibility.csv, delimiter(comma) varnames(1) case(preserve) 
-drop if cancer_opensafely_snomed_new==""&immunosuppresant_drugs_nhsd==""&oral_steroid_drugs_nhsd==""&immunosupression_nhsd_new==""&solid_organ_transplant_nhsd_new==""&downs_syndrome_nhsd==""&haematological_disease_nhsd==""&ckd_stage_5_nhsd==""&liver_disease_nhsd==""&hiv_aids_nhsd==""&multiple_sclerosis_nhsd==""&motor_neurone_disease_nhsd==""&myasthenia_gravis_nhsd==""&huntingtons_disease_nhsd=="" 
-
-foreach var of varlist covid_test_positive_date covid_test_positive_date2 covid_hosp_not_pri_admission covid_hosp_not_pri_admission2 covid_hosp_admission covid_hosp_admission2 ///
-		sotrovimab_GP paxlovid_GP molnupiravir_GP remdesivir_GP ///
-		date_treated_GP sotrovimab_covid_therapeutics_o paxlovid_covid_therapeutics_o molnupiravir_covid_therapeutics_ remdesivir_covid_therapeutics_o casirivimab_covid_therapeutics_o ///
-		date_treated_out death_with_covid_date death_date all_hosp_admission all_hosp_admission2 date_treated date_treated_hosp   ///
-	   cancer_opensafely_snomed_new   immunosuppresant_drugs_nhsd ///
-	   oral_steroid_drugs_nhsd  immunosupression_nhsd_new   solid_organ_transplant_nhsd_new  haematological_malignancies_snom haematological_malignancies_icd1 ///
-	   downs_syndrome_nhsd haematological_disease_nhsd ckd_stage_5_nhsd liver_disease_nhsd hiv_aids_nhsd  ///
-	   multiple_sclerosis_nhsd motor_neurone_disease_nhsd myasthenia_gravis_nhsd huntingtons_disease_nhsd  liver_disease_nhsd_icd10  {
-  capture confirm string variable `var'
-  if _rc==0 {
-  rename `var' a
-  gen `var' = date(a, "YMD")
-  drop a
-  format %td `var'
-  }
-}
-
-*10 high risk groups: downs_syndrome, solid_cancer, haematological_disease, renal_disease, liver_disease, imid, 
-*immunosupression, hiv_aids, solid_organ_transplant, rare_neurological_conditions, high_risk_group_combined	
-replace oral_steroid_drugs_nhsd=. if oral_steroid_drug_nhsd_3m_count < 2 & oral_steroid_drug_nhsd_12m_count < 4
-gen imid_nhsd=min(oral_steroid_drugs_nhsd, immunosuppresant_drugs_nhsd)
-gen rare_neuro_nhsd = min(multiple_sclerosis_nhsd, motor_neurone_disease_nhsd, myasthenia_gravis_nhsd, huntingtons_disease_nhsd)
-*high risk group only based on codelists*
-gen downs_syndrome=(downs_syndrome_nhsd!=.)
-gen solid_cancer_new=(cancer_opensafely_snomed_new!=.)
-tab solid_cancer_new
-gen haema_disease=( haematological_disease_nhsd !=.)
-tab haema_disease
-gen renal_disease=( ckd_stage_5_nhsd !=.)
-gen liver_disease=( liver_disease_nhsd !=.)
-gen imid=( imid_nhsd !=.)
-tab imid
-gen immunosupression_new=( immunosupression_nhsd_new!=.)
-tab immunosupression_new
-gen hiv_aids=( hiv_aids_nhsd !=.)
-tab hiv_aids
-gen solid_organ_new=( solid_organ_transplant_nhsd_new!=.)
-tab solid_organ_new
-gen rare_neuro=( rare_neuro_nhsd !=.)
-gen high_risk_group_new=(( downs_syndrome + solid_cancer_new + haema_disease + renal_disease + liver_disease + imid + immunosupression_new + hiv_aids + solid_organ_new + rare_neuro )>0)
-tab high_risk_group_new,m
-keep if high_risk_group_new==1
-count 
-
-
-gen infect_month=month(covid_test_positive_date)
-tab infect_month
-gen infect_month2=month(covid_test_positive_date2)
-tab infect_month2
-tab region_nhs,m
-tab region_nhs infect_month, row
-tab region_nhs infect_month2, row
-tab stp,m
-tab stp infect_month, row
-tab stp infect_month2, row
-
-gen sotro_month_o=month(sotrovimab_covid_therapeutics_o)
-gen pax_month_o=month(paxlovid_covid_therapeutics_o)
-gen mol_month_o=month(molnupiravir_covid_therapeutics_)
-gen rem_month_o=month(remdesivir_covid_therapeutics_o)
-gen treated_month_o=month(date_treated_out)
-tab sotro_month_o
-tab pax_month_o
-tab mol_month_o
-tab rem_month_o
-tab treated_month_o
-tab region_nhs sotro_month_o, row
-tab region_nhs pax_month_o, row
-tab region_nhs mol_month_o, row
-tab region_nhs rem_month_o, row
-tab region_nhs treated_month_o, row
-tab stp treated_month_o,row
-
-gen sotro_month_GP=month(sotrovimab_GP)
-gen pax_month_GP=month(paxlovid_GP)
-gen mol_month_GP=month(molnupiravir_GP)
-gen rem_month_GP=month(remdesivir_GP)
-gen treated_month_GP=month(date_treated_GP)
-tab sotro_month_GP
-tab pax_month_GP
-tab mol_month_GP
-tab rem_month_GP
-tab treated_month_GP
-tab region_nhs sotro_month_GP, row
-tab region_nhs pax_month_GP, row
-tab region_nhs mol_month_GP, row
-tab region_nhs rem_month_GP, row
-tab region_nhs treated_month_GP, row
-tab stp treated_month_GP,row
-
-gen sotro_month=min(sotro_month_o,sotro_month_GP)
-gen pax_month=min(pax_month_o,pax_month_GP)
-gen mol_month=min(mol_month_o,mol_month_GP)
-gen rem_month=min(rem_month_o,rem_month_GP)
-gen treated_month=min(treated_month_o,treated_month_GP)
-tab sotro_month
-tab pax_month
-tab mol_month
-tab rem_month
-tab treated_month
-tab region_nhs sotro_month, row
-tab region_nhs pax_month, row
-tab region_nhs mol_month, row
-tab region_nhs rem_month, row
-tab region_nhs treated_month, row
-tab stp treated_month,row
-
-gen covid_hosp_not_pri_month=month(covid_hosp_not_pri_admission)
-tab covid_hosp_not_pri_month
-tab region_nhs covid_hosp_not_pri_month,row
-tab stp covid_hosp_not_pri_month,row
-gen covid_hosp_month=month(covid_hosp_admission)
-tab covid_hosp_month
-tab region_nhs covid_hosp_month,row
-tab stp covid_hosp_month,row
-gen all_hosp_admission_month=month(all_hosp_admission)
-tab all_hosp_admission_month
-tab region_nhs all_hosp_admission_month,row
-tab stp all_hosp_admission_month,row
-gen all_hosp_admission_month2=month(all_hosp_admission2)
-tab all_hosp_admission_month2
-tab region_nhs all_hosp_admission_month2,row
-tab stp all_hosp_admission_month2,row
-
-gen death_with_covid_month=month(death_with_covid_date)
-tab death_with_covid_month
-tab region_nhs death_with_covid_month,row
-tab stp death_with_covid_month,row
-
-gen death_month=month(death_date)
-tab death_month
-tab region_nhs death_month,row
-tab stp death_month,row
-
-gen treated_month=month(date_treated)
-tab treated_month
-tab region_nhs treated_month, row
-tab stp treated_month,row
-
-gen treated_month_hosp=month(date_treated_hosp)
-tab treated_month_hosp
-tab region_nhs treated_month_hosp, row
-tab stp treated_month_hosp,row
 
 
 
