@@ -30,9 +30,10 @@ import delimited ./output/input_feasibility.csv, delimiter(comma) varnames(1) ca
 *describe
 keep if covid_test_positive_date!=""
 *  Convert strings to dates  *
-foreach var of varlist     covid_test_positive_date covid_test_positive_date2 covid_hosp_not_pri_admission covid_hosp_not_pri_admission2 covid_hosp_admission covid_hosp_admission2 ///
+foreach var of varlist  sotrovimab_covid_therapeutics molnupiravir_covid_therapeutics paxlovid_covid_therapeutics remdesivir_covid_therapeutics	 date_treated  ///
+        covid_test_positive_date covid_test_positive_date2 covid_hosp_not_pri_admission covid_hosp_not_pri_admission2 covid_hosp_admission covid_hosp_admission2 ///
 		sotrovimab_GP paxlovid_GP molnupiravir_GP remdesivir_GP ///
-		date_treated_GP sotrovimab_covid_therapeutics_o paxlovid_covid_therapeutics_o molnupiravir_covid_therapeutics_ remdesivir_covid_therapeutics_o casirivimab_covid_therapeutics_o ///
+		date_treated_GP sotrovimab_covid_therapeutics_o paxlovid_covid_therapeutics_o molnupiravir_covid_therapeutics_o remdesivir_covid_therapeutics_o casirivimab_covid_therapeutics_o ///
 		date_treated_out death_with_covid_date death_date all_hosp_admission all_hosp_admission2 {
   capture confirm string variable `var'
   if _rc==0 {
@@ -56,7 +57,7 @@ tab stp infect_month2, row
 
 gen sotro_month_o=month(sotrovimab_covid_therapeutics_o)
 gen pax_month_o=month(paxlovid_covid_therapeutics_o)
-gen mol_month_o=month(molnupiravir_covid_therapeutics_)
+gen mol_month_o=month(molnupiravir_covid_therapeutics_o)
 gen rem_month_o=month(remdesivir_covid_therapeutics_o)
 gen treated_month_o=month(date_treated_out)
 tab sotro_month_o
@@ -127,153 +128,6 @@ tab death_with_covid_month
 tab region_nhs death_with_covid_month,row
 tab stp death_with_covid_month,row
 
-gen death_month=month(death_date)
-tab death_month
-tab region_nhs death_month,row
-tab stp death_month,row
-
-
-clear
-
-* import dataset
-import delimited ./output/input_feasibility.csv, delimiter(comma) varnames(1) case(preserve) 
-*describe
-keep if date_treated_GP!="" | date_treated_out!=""
-*  Convert strings to dates  *
-foreach var of varlist      covid_test_positive_date covid_test_positive_date2 	sotrovimab_GP paxlovid_GP molnupiravir_GP remdesivir_GP ///
-		date_treated_GP sotrovimab_covid_therapeutics_o paxlovid_covid_therapeutics_o molnupiravir_covid_therapeutics_ remdesivir_covid_therapeutics_o casirivimab_covid_therapeutics_o ///
-		date_treated_out {
-  capture confirm string variable `var'
-  if _rc==0 {
-  rename `var' a
-  gen `var' = date(a, "YMD")
-  drop a
-  format %td `var'
-  sum `var',f
-  }
-}
-gen infect_month=month(covid_test_positive_date)
-tab infect_month
-gen infect_month2=month(covid_test_positive_date2)
-tab infect_month2
-tab region_nhs,m
-tab region_nhs infect_month, row
-tab region_nhs infect_month2, row
-tab stp,m
-tab stp infect_month, row
-tab stp infect_month2, row
-
-gen sotro_month_o=month(sotrovimab_covid_therapeutics_o)
-gen pax_month_o=month(paxlovid_covid_therapeutics_o)
-gen mol_month_o=month(molnupiravir_covid_therapeutics_)
-gen rem_month_o=month(remdesivir_covid_therapeutics_o)
-gen treated_month_o=month(date_treated_out)
-tab sotro_month_o
-tab pax_month_o
-tab mol_month_o
-tab rem_month_o
-tab treated_month_o
-tab region_nhs sotro_month_o, row
-tab region_nhs pax_month_o, row
-tab region_nhs mol_month_o, row
-tab region_nhs rem_month_o, row
-tab region_nhs treated_month_o, row
-tab stp treated_month_o,row
-
-gen sotro_month_GP=month(sotrovimab_GP)
-gen pax_month_GP=month(paxlovid_GP)
-gen mol_month_GP=month(molnupiravir_GP)
-gen rem_month_GP=month(remdesivir_GP)
-gen treated_month_GP=month(date_treated_GP)
-tab sotro_month_GP
-tab pax_month_GP
-tab mol_month_GP
-tab rem_month_GP
-tab treated_month_GP
-tab region_nhs sotro_month_GP, row
-tab region_nhs pax_month_GP, row
-tab region_nhs mol_month_GP, row
-tab region_nhs rem_month_GP, row
-tab region_nhs treated_month_GP, row
-tab stp treated_month_GP,row
-
-gen sotro_month=min(sotro_month_o,sotro_month_GP)
-gen pax_month=min(pax_month_o,pax_month_GP)
-gen mol_month=min(mol_month_o,mol_month_GP)
-gen rem_month=min(rem_month_o,rem_month_GP)
-gen treated_month=min(treated_month_o,treated_month_GP)
-tab sotro_month
-tab pax_month
-tab mol_month
-tab rem_month
-tab treated_month
-tab region_nhs sotro_month, row
-tab region_nhs pax_month, row
-tab region_nhs mol_month, row
-tab region_nhs rem_month, row
-tab region_nhs treated_month, row
-tab stp treated_month,row
-
-by treated_month, sort: count if infect_month==treated_month|infect_month==(treated_month-1)
-
-clear
-
-* import dataset
-import delimited ./output/input_feasibility.csv, delimiter(comma) varnames(1) case(preserve) 
-*describe
-keep if all_hosp_admission!=""
-*  Convert strings to dates  *
-foreach var of varlist      covid_test_positive_date covid_test_positive_date2 covid_hosp_not_pri_admission covid_hosp_not_pri_admission2 covid_hosp_admission covid_hosp_admission2 ///
-		 all_hosp_admission all_hosp_admission2 {
-  capture confirm string variable `var'
-  if _rc==0 {
-  rename `var' a
-  gen `var' = date(a, "YMD")
-  drop a
-  format %td `var'
-  sum `var',f
-  }
-}
-
-gen covid_hosp_not_pri_month=month(covid_hosp_not_pri_admission)
-tab covid_hosp_not_pri_month
-tab region_nhs covid_hosp_not_pri_month,row
-tab stp covid_hosp_not_pri_month,row
-gen covid_hosp_month=month(covid_hosp_admission)
-tab covid_hosp_month
-tab region_nhs covid_hosp_month,row
-tab stp covid_hosp_month,row
-gen all_hosp_admission_month=month(all_hosp_admission)
-tab all_hosp_admission_month
-tab region_nhs all_hosp_admission_month,row
-tab stp all_hosp_admission_month,row
-gen all_hosp_admission_month2=month(all_hosp_admission2)
-tab all_hosp_admission_month2
-tab region_nhs all_hosp_admission_month2,row
-tab stp all_hosp_admission_month2,row
-
-gen infect_month=month(covid_test_positive_date)
-by covid_hosp_not_pri_month, sort: count if infect_month==covid_hosp_not_pri_month|infect_month==(covid_hosp_not_pri_month-1)
-
-
-clear
-
-* import dataset
-import delimited ./output/input_feasibility.csv, delimiter(comma) varnames(1) case(preserve) 
-*describe
-keep if death_date!=""
-*  Convert strings to dates  *
-foreach var of varlist  death_with_covid_date death_date  {
-  capture confirm string variable `var'
-  if _rc==0 {
-  rename `var' a
-  gen `var' = date(a, "YMD")
-  drop a
-  format %td `var'
-  sum `var',f
-  }
-}
-
 gen death_with_covid_month=month(death_with_covid_date)
 tab death_with_covid_month
 tab region_nhs death_with_covid_month,row
@@ -283,19 +137,9 @@ gen death_month=month(death_date)
 tab death_month
 tab region_nhs death_month,row
 tab stp death_month,row
-
-
 
 log close
 exit, clear
-
-
-
-
-
-
-
-
 
 *codebook
 keep if date_treated!=""|date_treated_hosp!=""|all_hosp_admission!=""
