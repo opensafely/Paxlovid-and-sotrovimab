@@ -33,19 +33,16 @@ keep if covid_test_positive_date!=""
 foreach var of varlist     covid_test_positive_date covid_test_positive_date2 covid_hosp_not_pri_admission covid_hosp_not_pri_admission2 covid_hosp_admission covid_hosp_admission2 ///
 		sotrovimab_GP paxlovid_GP molnupiravir_GP remdesivir_GP ///
 		date_treated_GP sotrovimab_covid_therapeutics_o paxlovid_covid_therapeutics_o molnupiravir_covid_therapeutics_ remdesivir_covid_therapeutics_o casirivimab_covid_therapeutics_o ///
-		date_treated_out death_with_covid_date death_date all_hosp_admission all_hosp_admission2 date_treated date_treated_hosp {
+		date_treated_out death_with_covid_date death_date all_hosp_admission all_hosp_admission2 {
   capture confirm string variable `var'
   if _rc==0 {
   rename `var' a
   gen `var' = date(a, "YMD")
   drop a
   format %td `var'
-  sum `var',f de
+  sum `var',f
   }
 }
-log close
-exit, clear
-
 gen infect_month=month(covid_test_positive_date)
 tab infect_month
 gen infect_month2=month(covid_test_positive_date2)
