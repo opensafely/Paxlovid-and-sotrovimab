@@ -141,7 +141,7 @@ import delimited ./output/input_feasibility.csv, delimiter(comma) varnames(1) ca
 *describe
 keep if date_treated_GP!="" | date_treated_out!=""
 *  Convert strings to dates  *
-foreach var of varlist      covid_test_positive_date covid_test_positive_date2 	sotrovimab_GP paxlovid_GP paxlovid_GP2 molnupiravir_GP molnupiravir_GP2 remdesivir_GP ///
+foreach var of varlist      covid_test_positive_date covid_test_positive_date2 	sotrovimab_GP paxlovid_GP molnupiravir_GP remdesivir_GP ///
 		date_treated_GP sotrovimab_covid_therapeutics_o paxlovid_covid_therapeutics_o molnupiravir_covid_therapeutics_ remdesivir_covid_therapeutics_o casirivimab_covid_therapeutics_o ///
 		date_treated_out {
   capture confirm string variable `var'
@@ -183,23 +183,17 @@ tab stp treated_month_o,row
 
 gen sotro_month_GP=month(sotrovimab_GP)
 gen pax_month_GP=month(paxlovid_GP)
-gen pax_month_GP2=month(paxlovid_GP2)
 gen mol_month_GP=month(molnupiravir_GP)
-gen mol_month_GP2=month(molnupiravir_GP2)
 gen rem_month_GP=month(remdesivir_GP)
 gen treated_month_GP=month(date_treated_GP)
 tab sotro_month_GP
 tab pax_month_GP
-tab pax_month_GP2
 tab mol_month_GP
-tab mol_month_GP2
 tab rem_month_GP
 tab treated_month_GP
 tab region_nhs sotro_month_GP, row
 tab region_nhs pax_month_GP, row
-tab region_nhs pax_month_GP2, row
 tab region_nhs mol_month_GP, row
-tab region_nhs mol_month_GP2, row
 tab region_nhs rem_month_GP, row
 tab region_nhs treated_month_GP, row
 tab stp treated_month_GP,row
